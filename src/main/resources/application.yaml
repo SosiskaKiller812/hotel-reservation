@@ -1,0 +1,16 @@
+server:
+    port: 8080
+
+spring:
+
+    application:
+        name: hotelreservation
+
+    jpa:
+        hibernate:
+            ddl-auto: update
+
+    datasource:
+        url: jdbc:postgresql://localhost:5432/hotel-reservation
+        username: postgres
+        password: password
