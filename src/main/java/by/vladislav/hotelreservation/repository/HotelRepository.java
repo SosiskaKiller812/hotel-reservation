@@ -13,7 +13,7 @@ import by.vladislav.hotelreservation.entity.Hotel;
 public interface HotelRepository extends JpaRepository<Hotel, Long> {
   Optional<Hotel> findByName(String name);
 
-  @EntityGraph(attributePaths = { "rooms" })
+  @EntityGraph(attributePaths = { "rooms", "conviniences" })
   List<Hotel> findAll();
 
 }

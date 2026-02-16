@@ -2,10 +2,10 @@ package by.vladislav.hotelreservation.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import by.vladislav.hotelreservation.entity.Hotel;
 import by.vladislav.hotelreservation.service.HotelService;
 import lombok.AllArgsConstructor;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,13 +18,13 @@ public class MainController {
   private final HotelService hotelService;
 
   @GetMapping("/hotel/name")
-  public Hotel getHotel(@RequestParam String hotel) {
-    return hotelService.findByName(hotel);
+  public ResponseEntity<?> getHotel(@RequestParam String hotel) {
+    return ResponseEntity.status(HttpStatus.FOUND).body(hotelService.findByName(hotel));
   }
 
-  @GetMapping("/hotel/id/{id}")
-  public ResponseEntity<Hotel> getMethodName(@PathVariable Long id) {
-    return ResponseEntity.ok(hotelService.findById(id));
+  @GetMapping("/id/{id}")
+  public ResponseEntity<?> getMethodName(@PathVariable Long id) {
+    return ResponseEntity.status(HttpStatus.FOUND).body(hotelService.findById(id));
   }
 
 }
