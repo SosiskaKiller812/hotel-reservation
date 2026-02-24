@@ -1,4 +1,4 @@
-package by.vladislav.hotelreservation.utils;
+package by.vladislav.hotelreservation.mapper;
 
 import java.math.BigDecimal;
 import java.time.temporal.ChronoUnit;
@@ -6,7 +6,7 @@ import java.time.temporal.ChronoUnit;
 import org.springframework.stereotype.Component;
 
 import by.vladislav.hotelreservation.entity.Booking;
-import by.vladislav.hotelreservation.entity.DTO.BookingDTO;
+import by.vladislav.hotelreservation.entity.dto.BookingDTO;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor

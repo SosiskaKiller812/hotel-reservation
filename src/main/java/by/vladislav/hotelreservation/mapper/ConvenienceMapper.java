@@ -1,9 +1,9 @@
-package by.vladislav.hotelreservation.utils;
+package by.vladislav.hotelreservation.mapper;
 
 import org.springframework.stereotype.Component;
 
 import by.vladislav.hotelreservation.entity.Convenience;
-import by.vladislav.hotelreservation.entity.DTO.ConvenienceDTO;
+import by.vladislav.hotelreservation.entity.dto.ConvenienceDTO;
 
 @Component
 public class ConvenienceMapper {

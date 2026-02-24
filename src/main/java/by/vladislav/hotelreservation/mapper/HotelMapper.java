@@ -1,4 +1,4 @@
-package by.vladislav.hotelreservation.utils;
+package by.vladislav.hotelreservation.mapper;
 
 import java.util.List;
 import java.util.Set;
@@ -9,9 +9,9 @@ import org.springframework.stereotype.Component;
 import by.vladislav.hotelreservation.entity.Address;
 import by.vladislav.hotelreservation.entity.Convenience;
 import by.vladislav.hotelreservation.entity.Hotel;
-import by.vladislav.hotelreservation.entity.DTO.AddressDTO;
-import by.vladislav.hotelreservation.entity.DTO.HotelDTO;
-import by.vladislav.hotelreservation.entity.DTO.RoomDTO;
+import by.vladislav.hotelreservation.entity.dto.AddressDTO;
+import by.vladislav.hotelreservation.entity.dto.HotelDTO;
+import by.vladislav.hotelreservation.entity.dto.RoomDTO;
 import lombok.AllArgsConstructor;
 
 @Component
@@ -50,14 +50,12 @@ public class HotelMapper {
         .map(room -> roomMapper.toDTO(room))
         .toList();
 
-    HotelDTO hotelDTO = new HotelDTO(
+    return new HotelDTO(
         hotel.getId(),
         hotel.getName(),
         addressDTO,
         hotel.getRating(),
         roomsDTO,
         conveniencesStrings);
-
-    return hotelDTO;
   }
 }

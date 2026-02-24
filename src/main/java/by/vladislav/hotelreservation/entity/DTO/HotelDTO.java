@@ -1,4 +1,4 @@
-package by.vladislav.hotelreservation.entity.DTO;
+package by.vladislav.hotelreservation.entity.dto;
 
 import java.math.BigDecimal;
 import java.util.List;

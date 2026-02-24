@@ -2,6 +2,7 @@ package by.vladislav.hotelreservation.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import by.vladislav.hotelreservation.entity.dto.HotelDTO;
 import by.vladislav.hotelreservation.service.HotelService;
 import lombok.AllArgsConstructor;
 
@@ -18,12 +19,12 @@ public class MainController {
   private final HotelService hotelService;
 
   @GetMapping("/hotel/name")
-  public ResponseEntity<?> getHotel(@RequestParam String hotel) {
+  public ResponseEntity<HotelDTO> getHotel(@RequestParam String hotel) {
     return ResponseEntity.status(HttpStatus.FOUND).body(hotelService.findByName(hotel));
   }
 
   @GetMapping("/id/{id}")
-  public ResponseEntity<?> getMethodName(@PathVariable Long id) {
+  public ResponseEntity<HotelDTO> getMethodName(@PathVariable Long id) {
     return ResponseEntity.status(HttpStatus.FOUND).body(hotelService.findById(id));
   }
 

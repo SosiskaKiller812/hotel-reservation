@@ -5,10 +5,10 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import by.vladislav.hotelreservation.entity.Convenience;
-import by.vladislav.hotelreservation.entity.DTO.ConvenienceDTO;
+import by.vladislav.hotelreservation.entity.dto.ConvenienceDTO;
+import by.vladislav.hotelreservation.exception.EntityNotFoundException;
+import by.vladislav.hotelreservation.mapper.ConvenienceMapper;
 import by.vladislav.hotelreservation.repository.ConvenienceRepository;
-import by.vladislav.hotelreservation.utils.ConvenienceMapper;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -27,7 +27,7 @@ public class ConvenienceService {
   public ConvenienceDTO findById(long id) {
     Convenience entity = convenienceRepository.findById(id)
         .orElseThrow(
-            () -> new EntityNotFoundException("Convenience with id: " + id + " not found"));
+            () -> new EntityNotFoundException("Convenience", "id", id));
     return convenienceMapper.toDTO(entity);
   }
 
@@ -42,7 +42,7 @@ public class ConvenienceService {
   public ConvenienceDTO update(ConvenienceDTO convenienceDTO) {
     Convenience convenienceEntity = convenienceRepository.findById(convenienceDTO.id())
         .orElseThrow(
-            () -> new EntityNotFoundException("Convenience with id: " + convenienceDTO.id() + " not found"));
+            () -> new EntityNotFoundException("Convenience", "id", convenienceDTO.id()));
 
     convenienceEntity.setName(convenienceDTO.name());
 

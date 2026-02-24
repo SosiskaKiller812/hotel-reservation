@@ -1,9 +1,9 @@
-package by.vladislav.hotelreservation.utils;
+package by.vladislav.hotelreservation.mapper;
 
 import org.springframework.stereotype.Component;
 
 import by.vladislav.hotelreservation.entity.Address;
-import by.vladislav.hotelreservation.entity.DTO.AddressDTO;
+import by.vladislav.hotelreservation.entity.dto.AddressDTO;
 
 @Component
 public class AddressMapper {

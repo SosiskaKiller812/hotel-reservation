@@ -1,5 +1,7 @@
 package by.vladislav.hotelreservation.controller;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -11,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import by.vladislav.hotelreservation.entity.DTO.ConvenienceDTO;
+import by.vladislav.hotelreservation.entity.dto.ConvenienceDTO;
 import by.vladislav.hotelreservation.service.ConvenienceService;
 import lombok.AllArgsConstructor;
 
@@ -22,27 +24,27 @@ public class ConvenienceCRUD {
   private final ConvenienceService convenienceService;
 
   @PostMapping("/create")
-  public ResponseEntity<?> create(@RequestBody ConvenienceDTO hotelRequest) {
+  public ResponseEntity<ConvenienceDTO> create(@RequestBody ConvenienceDTO hotelRequest) {
     return ResponseEntity.status(HttpStatus.CREATED).body(convenienceService.create(hotelRequest));
   }
 
   @GetMapping("/id/{id}")
-  public ResponseEntity<?> findById(@PathVariable Long id) {
+  public ResponseEntity<ConvenienceDTO> findById(@PathVariable Long id) {
     return ResponseEntity.status(HttpStatus.FOUND).body(convenienceService.findById(id));
   }
 
   @GetMapping("")
-  public ResponseEntity<?> findAll() {
+  public ResponseEntity<List<ConvenienceDTO>> findAll() {
     return ResponseEntity.status(HttpStatus.FOUND).body(convenienceService.findAll());
   }
 
   @PutMapping("/update")
-  public ResponseEntity<?> update(@RequestBody ConvenienceDTO convenienceRequest) {
+  public ResponseEntity<ConvenienceDTO> update(@RequestBody ConvenienceDTO convenienceRequest) {
     return ResponseEntity.status(HttpStatus.OK).body(convenienceService.update(convenienceRequest));
   }
 
   @DeleteMapping("/remove/{id}")
-  public ResponseEntity<?> removeById(@PathVariable Long id) {
+  public ResponseEntity<String> removeById(@PathVariable Long id) {
     convenienceService.removeById(id);
     return ResponseEntity.status(HttpStatus.FOUND).body("Deleted");
   }

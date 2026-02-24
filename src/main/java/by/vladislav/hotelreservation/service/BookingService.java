@@ -9,12 +9,12 @@ import org.springframework.stereotype.Service;
 
 import by.vladislav.hotelreservation.entity.Booking;
 import by.vladislav.hotelreservation.entity.Room;
-import by.vladislav.hotelreservation.entity.DTO.BookingDTO;
-import by.vladislav.hotelreservation.entity.DTO.RoomDTO;
+import by.vladislav.hotelreservation.entity.dto.BookingDTO;
+import by.vladislav.hotelreservation.entity.dto.RoomDTO;
+import by.vladislav.hotelreservation.exception.EntityNotFoundException;
+import by.vladislav.hotelreservation.mapper.BookingMapper;
 import by.vladislav.hotelreservation.repository.BookingRepository;
 import by.vladislav.hotelreservation.repository.RoomRepository;
-import by.vladislav.hotelreservation.utils.BookingMapper;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -29,7 +29,7 @@ public class BookingService {
 
     RoomDTO roomDto = dto.room();
     Room room = roomRepository.findById(roomDto.id())
-        .orElseThrow(() -> new EntityNotFoundException("Room not found"));
+        .orElseThrow(() -> new EntityNotFoundException("Room", "id", roomDto.id()));
 
     Booking entity = bookingMapper.toEntity(dto);
 
@@ -48,7 +48,7 @@ public class BookingService {
 
   public BookingDTO findById(long id) {
     Booking entity = bookingRepository.findById(id)
-        .orElseThrow(() -> new EntityNotFoundException("Booking with id: " + id + " not found"));
+        .orElseThrow(() -> new EntityNotFoundException("Booking", "id", id));
     return bookingMapper.toDTO(entity);
   }
 
@@ -63,7 +63,7 @@ public class BookingService {
   public BookingDTO update(BookingDTO dto) {
     Booking entity = bookingRepository.findById(dto.id())
         .orElseThrow(
-            () -> new EntityNotFoundException("Booking with id: " + dto.id() + " not found"));
+            () -> new EntityNotFoundException("Booking", "id", dto.id()));
 
     entity.setGuestName(dto.guestName());
     entity.setCheckInDate(dto.checkInDate());

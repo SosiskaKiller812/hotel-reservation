@@ -10,12 +10,12 @@ import org.springframework.stereotype.Service;
 import by.vladislav.hotelreservation.entity.Convenience;
 import by.vladislav.hotelreservation.entity.Hotel;
 import by.vladislav.hotelreservation.entity.Room;
-import by.vladislav.hotelreservation.entity.DTO.HotelDTO;
+import by.vladislav.hotelreservation.entity.dto.HotelDTO;
+import by.vladislav.hotelreservation.exception.EntityNotFoundException;
+import by.vladislav.hotelreservation.mapper.HotelMapper;
+import by.vladislav.hotelreservation.mapper.RoomMapper;
 import by.vladislav.hotelreservation.repository.ConvenienceRepository;
 import by.vladislav.hotelreservation.repository.HotelRepository;
-import by.vladislav.hotelreservation.utils.HotelMapper;
-import by.vladislav.hotelreservation.utils.RoomMapper;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
@@ -30,13 +30,13 @@ public class HotelService {
 
   public HotelDTO findByName(String name) {
     Hotel hotel = repository.findByName(name)
-        .orElseThrow(() -> new EntityNotFoundException("Hotel with with name:" + name + " not found"));
+        .orElseThrow(() -> new EntityNotFoundException("Hotel", "name", name));
     return hotelMapper.toDTO(hotel);
   }
 
   public HotelDTO findById(long id) {
     Hotel hotel = repository.findById(id)
-        .orElseThrow(() -> new EntityNotFoundException("Hotel with with id:" + id + " not found"));
+        .orElseThrow(() -> new EntityNotFoundException("Hotel", "id", id));
     return hotelMapper.toDTO(hotel);
   }
 
@@ -65,8 +65,9 @@ public class HotelService {
     if (dto.rooms() != null) {
       List<Room> rooms = dto.rooms().stream()
           .map(roomMapper::toEntity)
-          .peek(room -> room.setHotel(savedHotel))
           .toList();
+
+      rooms.forEach(room -> room.setHotel(savedHotel));
 
       savedHotel.setRooms(rooms);
     }
@@ -83,14 +84,15 @@ public class HotelService {
     Hotel savedHotel = repository.saveAndFlush(hotel);
 
     if (!isTransactional) {
-      throw new RuntimeException("Error");
+      throw new IllegalArgumentException("Error");
     }
 
     if (dto.rooms() != null) {
       List<Room> rooms = dto.rooms().stream()
           .map(roomMapper::toEntity)
-          .peek(room -> room.setHotel(savedHotel))
           .toList();
+
+      rooms.forEach(room -> room.setHotel(savedHotel));
 
       savedHotel.setRooms(rooms);
     }
@@ -99,10 +101,11 @@ public class HotelService {
   }
 
   @Transactional
-  public Hotel update(HotelDTO dto) {
+  public HotelDTO update(HotelDTO dto) {
 
     Hotel hotel = repository.findById(dto.id())
-        .orElseThrow(() -> new EntityNotFoundException("Hotel with name:" + dto.id() + " not found"));
+        .orElseThrow(
+            () -> new EntityNotFoundException("Hotel", "id", dto.id()));
 
     hotel.setName(dto.name());
     hotel.setRating(dto.rating());
@@ -128,7 +131,7 @@ public class HotelService {
       hotel.getRooms().addAll(rooms);
     }
 
-    return hotel;
+    return hotelMapper.toDTO(hotel);
   }
 
 }
