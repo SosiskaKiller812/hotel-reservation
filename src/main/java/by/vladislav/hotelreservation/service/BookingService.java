@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import by.vladislav.hotelreservation.entity.Booking;
 import by.vladislav.hotelreservation.entity.Room;
+import by.vladislav.hotelreservation.entity.constant.EntityType;
 import by.vladislav.hotelreservation.entity.dto.BookingDTO;
 import by.vladislav.hotelreservation.entity.dto.RoomDTO;
 import by.vladislav.hotelreservation.exception.EntityNotFoundException;
@@ -29,7 +30,7 @@ public class BookingService {
 
     RoomDTO roomDto = dto.room();
     Room room = roomRepository.findById(roomDto.id())
-        .orElseThrow(() -> new EntityNotFoundException("Room", "id", roomDto.id()));
+        .orElseThrow(() -> new EntityNotFoundException(EntityType.ROOM, "id", roomDto.id()));
 
     Booking entity = bookingMapper.toEntity(dto);
 
@@ -48,7 +49,7 @@ public class BookingService {
 
   public BookingDTO findById(long id) {
     Booking entity = bookingRepository.findById(id)
-        .orElseThrow(() -> new EntityNotFoundException("Booking", "id", id));
+        .orElseThrow(() -> new EntityNotFoundException(EntityType.BOOKING, "id", id));
     return bookingMapper.toDTO(entity);
   }
 
@@ -63,7 +64,7 @@ public class BookingService {
   public BookingDTO update(BookingDTO dto) {
     Booking entity = bookingRepository.findById(dto.id())
         .orElseThrow(
-            () -> new EntityNotFoundException("Booking", "id", dto.id()));
+            () -> new EntityNotFoundException(EntityType.BOOKING, "id", dto.id()));
 
     entity.setGuestName(dto.guestName());
     entity.setCheckInDate(dto.checkInDate());

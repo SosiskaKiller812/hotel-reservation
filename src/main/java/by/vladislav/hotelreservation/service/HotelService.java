@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import by.vladislav.hotelreservation.entity.Convenience;
 import by.vladislav.hotelreservation.entity.Hotel;
 import by.vladislav.hotelreservation.entity.Room;
+import by.vladislav.hotelreservation.entity.constant.EntityType;
 import by.vladislav.hotelreservation.entity.dto.HotelDTO;
 import by.vladislav.hotelreservation.exception.EntityNotFoundException;
 import by.vladislav.hotelreservation.mapper.HotelMapper;
@@ -30,13 +31,13 @@ public class HotelService {
 
   public HotelDTO findByName(String name) {
     Hotel hotel = repository.findByName(name)
-        .orElseThrow(() -> new EntityNotFoundException("Hotel", "name", name));
+        .orElseThrow(() -> new EntityNotFoundException(EntityType.HOTEL, "name", name));
     return hotelMapper.toDTO(hotel);
   }
 
   public HotelDTO findById(long id) {
     Hotel hotel = repository.findById(id)
-        .orElseThrow(() -> new EntityNotFoundException("Hotel", "id", id));
+        .orElseThrow(() -> new EntityNotFoundException(EntityType.HOTEL, "id", id));
     return hotelMapper.toDTO(hotel);
   }
 
@@ -105,7 +106,7 @@ public class HotelService {
 
     Hotel hotel = repository.findById(dto.id())
         .orElseThrow(
-            () -> new EntityNotFoundException("Hotel", "id", dto.id()));
+            () -> new EntityNotFoundException(EntityType.HOTEL, "id", dto.id()));
 
     hotel.setName(dto.name());
     hotel.setRating(dto.rating());
