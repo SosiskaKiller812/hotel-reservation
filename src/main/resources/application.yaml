@@ -13,4 +13,4 @@ spring:
     datasource:
         url: jdbc:postgresql://localhost:5432/hotel-reservation
         username: postgres
-        password: password
+        password: ${DB_PASSWORD}

@@ -37,7 +37,7 @@ public class Hotel {
   private String name;
 
   @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-  @JoinColumn(name = "adress_id", nullable = false)
+  @JoinColumn(name = "address_id", nullable = false)
   private Address address;
 
   private BigDecimal rating;
@@ -47,7 +47,7 @@ public class Hotel {
 
   @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(
-      name = "hotel_convenience",
+      name = "hotel_conveniences",
       joinColumns = @JoinColumn(name = "hotel_id"),
       inverseJoinColumns = @JoinColumn(name = "convenience_id"))
   private Set<Convenience> conveniences;

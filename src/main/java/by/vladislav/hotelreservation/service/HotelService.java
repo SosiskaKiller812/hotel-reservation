@@ -80,7 +80,7 @@ public class HotelService {
     Hotel hotel = hotelMapper.toEntity(dto);
     hotel.setConveniences(conveniences);
 
-    Hotel savedHotel = repository.save(hotel);
+    Hotel savedHotel = repository.saveAndFlush(hotel);
 
     if (!isTransactional) {
       throw new RuntimeException("Error");

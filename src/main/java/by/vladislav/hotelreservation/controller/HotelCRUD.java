@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 @RequestMapping("/hotels")
 public class HotelCRUD {
 
-  private final HotelService hotelService;
+  private final HotelService hotelService;  
 
   @PostMapping("/create")
   public ResponseEntity<?> create(@RequestBody HotelDTO hotelRequest) {
