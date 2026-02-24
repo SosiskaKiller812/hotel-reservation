@@ -28,6 +28,11 @@ public class HotelCRUD {
     return ResponseEntity.status(HttpStatus.CREATED).body(hotelService.create(hotelRequest));
   }
 
+  @PostMapping("/create/non-transactional")
+  public ResponseEntity<?> postMethodName(@RequestBody HotelDTO hotelRequest) {
+    return ResponseEntity.status(HttpStatus.OK).body(hotelService.createWithoutTransactional(hotelRequest, false));
+  }
+
   @GetMapping("/id/{id}")
   public ResponseEntity<?> findById(@PathVariable Long id) {
     return ResponseEntity.status(HttpStatus.FOUND).body(hotelService.findById(id));
@@ -38,7 +43,7 @@ public class HotelCRUD {
     return ResponseEntity.status(HttpStatus.FOUND).body(hotelService.findAll());
   }
 
-  @PutMapping("/{id}")
+  @PutMapping("/update")
   public ResponseEntity<?> update(@RequestBody HotelDTO hotelRequest) {
     return ResponseEntity.status(HttpStatus.OK).body(hotelService.update(hotelRequest));
   }

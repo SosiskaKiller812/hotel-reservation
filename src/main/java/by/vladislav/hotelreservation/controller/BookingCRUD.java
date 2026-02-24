@@ -11,40 +11,40 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import by.vladislav.hotelreservation.entity.DTO.ConvenienceDTO;
-import by.vladislav.hotelreservation.service.ConvenienceService;
+import by.vladislav.hotelreservation.entity.DTO.BookingDTO;
+import by.vladislav.hotelreservation.service.BookingService;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("/conveniences")
-public class ConvenienceCRUD {
-  private final ConvenienceService convenienceService;
+@RequestMapping("booking/")
+public class BookingCRUD {
+  private final BookingService bookingService;
 
   @PostMapping("/create")
-  public ResponseEntity<?> create(@RequestBody ConvenienceDTO hotelRequest) {
-    return ResponseEntity.status(HttpStatus.CREATED).body(convenienceService.create(hotelRequest));
+  public ResponseEntity<?> create(@RequestBody BookingDTO bookingRequest) {
+    return ResponseEntity.status(HttpStatus.CREATED).body(bookingService.create(bookingRequest));
   }
 
   @GetMapping("/id/{id}")
   public ResponseEntity<?> findById(@PathVariable Long id) {
-    return ResponseEntity.status(HttpStatus.FOUND).body(convenienceService.findById(id));
+    return ResponseEntity.status(HttpStatus.FOUND).body(bookingService.findById(id));
   }
 
   @GetMapping("")
   public ResponseEntity<?> findAll() {
-    return ResponseEntity.status(HttpStatus.FOUND).body(convenienceService.findAll());
+    return ResponseEntity.status(HttpStatus.FOUND).body(bookingService.findAll());
   }
 
   @PutMapping("/update")
-  public ResponseEntity<?> update(@RequestBody ConvenienceDTO convenienceRequest) {
-    return ResponseEntity.status(HttpStatus.OK).body(convenienceService.update(convenienceRequest));
+  public ResponseEntity<?> update(@RequestBody BookingDTO bookingRequest) {
+    return ResponseEntity.status(HttpStatus.OK).body(bookingService.update(bookingRequest));
   }
 
   @DeleteMapping("/remove/{id}")
   public ResponseEntity<?> removeById(@PathVariable Long id) {
-    convenienceService.removeById(id);
-    return ResponseEntity.status(HttpStatus.FOUND).body("Deleted");
+    bookingService.removeById(id);
+    return ResponseEntity.status(HttpStatus.OK).body("Deleted");
   }
 
 }

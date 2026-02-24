@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 import by.vladislav.hotelreservation.entity.Address;
 import by.vladislav.hotelreservation.entity.Convenience;
 import by.vladislav.hotelreservation.entity.Hotel;
-import by.vladislav.hotelreservation.entity.Room;
 import by.vladislav.hotelreservation.entity.DTO.AddressDTO;
 import by.vladislav.hotelreservation.entity.DTO.HotelDTO;
 import by.vladislav.hotelreservation.entity.DTO.RoomDTO;
@@ -21,29 +20,24 @@ public class HotelMapper {
 
   private final RoomMapper roomMapper;
 
-  public Hotel toEntity(HotelDTO hotelRequest,
-      Set<Convenience> conviniences,
-      Address address,
-      List<Room> rooms) {
-
-    Hotel hotelEntity = Hotel.builder()
-        .name(hotelRequest.name())
-        .address(address)
-        .rating(hotelRequest.rating())
-        .rooms(rooms)
-        .conveniences(conviniences)
+  public Hotel toEntity(HotelDTO dto) {
+    Address address = Address.builder()
+        .country(dto.address().country())
+        .city(dto.address().city())
+        .street(dto.address().street())
         .build();
 
-    for (Room room : rooms) {
-      room.setHotel(hotelEntity);
-    }
-
-    return hotelEntity;
+    return Hotel.builder()
+        .name(dto.name())
+        .address(address)
+        .rating(dto.rating())
+        .build();
   }
 
   public HotelDTO toDTO(Hotel hotel) {
-    
+
     AddressDTO addressDTO = new AddressDTO(
+        hotel.getAddress().getId(),
         hotel.getAddress().getCountry(),
         hotel.getAddress().getCity(),
         hotel.getAddress().getStreet());
@@ -57,6 +51,7 @@ public class HotelMapper {
         .toList();
 
     HotelDTO hotelDTO = new HotelDTO(
+        hotel.getId(),
         hotel.getName(),
         addressDTO,
         hotel.getRating(),

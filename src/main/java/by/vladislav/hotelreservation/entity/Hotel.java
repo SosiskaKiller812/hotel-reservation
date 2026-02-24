@@ -46,6 +46,9 @@ public class Hotel {
   private List<Room> rooms;
 
   @ManyToMany(fetch = FetchType.EAGER)
-  @JoinTable(name = "hotel_convenience", joinColumns = @JoinColumn(name = "hotel_id"), inverseJoinColumns = @JoinColumn(name = "convenience_id"))
+  @JoinTable(
+      name = "hotel_convenience",
+      joinColumns = @JoinColumn(name = "hotel_id"),
+      inverseJoinColumns = @JoinColumn(name = "convenience_id"))
   private Set<Convenience> conveniences;
 }

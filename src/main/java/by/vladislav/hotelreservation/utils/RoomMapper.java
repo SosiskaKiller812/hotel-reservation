@@ -17,7 +17,10 @@ public class RoomMapper {
   }
 
   public RoomDTO toDTO(Room roomEntity) {
-    return new RoomDTO(roomEntity.getNumber(), roomEntity.getType(), roomEntity.getPricePerNight());
+    return new RoomDTO(
+        roomEntity.getId(),
+        roomEntity.getNumber(),
+        roomEntity.getType(),
+        roomEntity.getPricePerNight());
   }
-
 }

@@ -13,7 +13,9 @@ public class ConvenienceMapper {
         .build();
   }
 
-  public ConvenienceDTO toDTO(Convenience convenience) {
-    return new ConvenienceDTO(convenience.getName());
+  public ConvenienceDTO toDTO(Convenience entity) {
+    return new ConvenienceDTO(
+        entity.getId(),
+        entity.getName());
   }
 }

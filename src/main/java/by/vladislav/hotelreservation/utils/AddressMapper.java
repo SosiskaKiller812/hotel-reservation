@@ -15,7 +15,11 @@ public class AddressMapper {
         .build();
   }
 
-  public AddressDTO toDTO(Address entity){
-    return new AddressDTO(entity.getCountry(), entity.getCity(), entity.getStreet());
+  public AddressDTO toDTO(Address entity) {
+    return new AddressDTO(
+        entity.getId(),
+        entity.getCountry(),
+        entity.getCity(),
+        entity.getStreet());
   }
 }

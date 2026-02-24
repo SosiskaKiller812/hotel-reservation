@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 public record HotelDTO(
+    Long id,
     String name,
     AddressDTO address,
     BigDecimal rating,

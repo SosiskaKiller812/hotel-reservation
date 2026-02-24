@@ -7,16 +7,15 @@ import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
-import by.vladislav.hotelreservation.entity.Address;
 import by.vladislav.hotelreservation.entity.Convenience;
 import by.vladislav.hotelreservation.entity.Hotel;
 import by.vladislav.hotelreservation.entity.Room;
 import by.vladislav.hotelreservation.entity.DTO.HotelDTO;
-import by.vladislav.hotelreservation.entity.DTO.RoomDTO;
 import by.vladislav.hotelreservation.repository.ConvenienceRepository;
 import by.vladislav.hotelreservation.repository.HotelRepository;
 import by.vladislav.hotelreservation.utils.HotelMapper;
 import by.vladislav.hotelreservation.utils.RoomMapper;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
@@ -27,15 +26,17 @@ public class HotelService {
   private final HotelRepository repository;
   private final HotelMapper hotelMapper;
   private final RoomMapper roomMapper;
-  private final ConvenienceRepository convinienceRepository;
+  private final ConvenienceRepository convenienceRepository;
 
   public HotelDTO findByName(String name) {
-    Hotel hotel = repository.findByName(name).orElseThrow(null);
+    Hotel hotel = repository.findByName(name)
+        .orElseThrow(() -> new EntityNotFoundException("Hotel with with name:" + name + " not found"));
     return hotelMapper.toDTO(hotel);
   }
 
   public HotelDTO findById(long id) {
-    Hotel hotel = repository.findById(id).orElseThrow(null);
+    Hotel hotel = repository.findById(id)
+        .orElseThrow(() -> new EntityNotFoundException("Hotel with with id:" + id + " not found"));
     return hotelMapper.toDTO(hotel);
   }
 
@@ -48,87 +49,86 @@ public class HotelService {
     return hotelsDTO;
   }
 
-  @Transactional
-  public HotelDTO create(HotelDTO hotelRequest) {
-    Hotel hotelEntity = createEntityFromDTO(hotelRequest);
-
-    Hotel newHotel = repository.save(hotelEntity);
-
-    return hotelMapper.toDTO(newHotel);
-  }
-
-  public HotelDTO createWithoutTransactional(HotelDTO hotelRequest) {
-    Hotel hotelEntity = createEntityFromDTO(hotelRequest);
-
-    Hotel newHotel = repository.save(hotelEntity);
-
-    return hotelMapper.toDTO(newHotel);
-  }
-
-  @Transactional
-  public HotelDTO update(HotelDTO hotelRequest) {
-    Hotel hotel = repository.findByName(hotelRequest.name()).orElseThrow();
-
-    changeDifference(hotel, hotelRequest);
-
-    return hotelMapper.toDTO(hotel);
-  }
-
   public void removeById(long id) {
     repository.deleteById(id);
   }
 
-  private void changeDifference(Hotel entity, HotelDTO dto) {
-    Hotel newEnityStats = createEntityFromDTO(dto);
+  @Transactional
+  public HotelDTO create(HotelDTO dto) {
+    Set<Convenience> conveniences = new HashSet<>(convenienceRepository.findByNameIn(dto.conveniences()));
 
-    if (newEnityStats.getName() != null) {
-      entity.setName(newEnityStats.getName());
+    Hotel hotel = hotelMapper.toEntity(dto);
+    hotel.setConveniences(conveniences);
+
+    Hotel savedHotel = repository.save(hotel);
+
+    if (dto.rooms() != null) {
+      List<Room> rooms = dto.rooms().stream()
+          .map(roomMapper::toEntity)
+          .peek(room -> room.setHotel(savedHotel))
+          .toList();
+
+      savedHotel.setRooms(rooms);
     }
 
-    if (newEnityStats.getAddress() != null) {
-      entity.setAddress(newEnityStats.getAddress());
-    }
-
-    if (newEnityStats.getRating() != null) {
-      entity.setRating(newEnityStats.getRating());
-    }
-
-    if (newEnityStats.getRooms() != null) {
-      entity.getRooms().clear();
-      for (RoomDTO roomDTO : dto.rooms()) {
-        Room room = roomMapper.toEntity(roomDTO);
-        room.setHotel(entity);
-        entity.getRooms().add(room);
-      }
-    }
-
-    if (newEnityStats.getConveniences() != null) {
-      entity.setConveniences(newEnityStats.getConveniences());
-    }
+    return hotelMapper.toDTO(savedHotel);
   }
 
-  private Hotel createEntityFromDTO(HotelDTO hotelDTO) {
-    Set<Convenience> conviniencesSet = new HashSet<>();
-    for (String convinienceName : hotelDTO.conveniences()) {
-      Convenience newConvinience = convinienceRepository.findByName(convinienceName).orElseThrow();
-      if (newConvinience != null) {
-        conviniencesSet.add(newConvinience);
-      }
+  public HotelDTO createWithoutTransactional(HotelDTO dto, boolean isTransactional) {
+    Set<Convenience> conveniences = new HashSet<>(convenienceRepository.findByNameIn(dto.conveniences()));
+
+    Hotel hotel = hotelMapper.toEntity(dto);
+    hotel.setConveniences(conveniences);
+
+    Hotel savedHotel = repository.save(hotel);
+
+    if (!isTransactional) {
+      throw new RuntimeException("Error");
     }
 
-    Address newAddress = Address.builder()
-        .country(hotelDTO.address().country())
-        .city(hotelDTO.address().city())
-        .street(hotelDTO.address().street())
-        .build();
+    if (dto.rooms() != null) {
+      List<Room> rooms = dto.rooms().stream()
+          .map(roomMapper::toEntity)
+          .peek(room -> room.setHotel(savedHotel))
+          .toList();
 
-    List<Room> roomsList = new ArrayList<>(hotelDTO.rooms().size());
-
-    for (RoomDTO roomRequest : hotelDTO.rooms()) {
-      Room newRoom = roomMapper.toEntity(roomRequest);
-      roomsList.add(newRoom);
+      savedHotel.setRooms(rooms);
     }
 
-    return hotelMapper.toEntity(hotelDTO, conviniencesSet, newAddress, roomsList);
+    return hotelMapper.toDTO(savedHotel);
   }
+
+  @Transactional
+  public Hotel update(HotelDTO dto) {
+
+    Hotel hotel = repository.findById(dto.id())
+        .orElseThrow(() -> new EntityNotFoundException("Hotel with name:" + dto.id() + " not found"));
+
+    hotel.setName(dto.name());
+    hotel.setRating(dto.rating());
+
+    hotel.getAddress().setCountry(dto.address().country());
+    hotel.getAddress().setCity(dto.address().city());
+    hotel.getAddress().setStreet(dto.address().street());
+
+    Set<Convenience> conveniences = new HashSet<>(convenienceRepository.findByNameIn(dto.conveniences()));
+    hotel.setConveniences(conveniences);
+
+    hotel.getRooms().clear();
+
+    if (dto.rooms() != null) {
+      List<Room> rooms = dto.rooms().stream()
+          .map(roomDto -> {
+            Room room = roomMapper.toEntity(roomDto);
+            room.setHotel(hotel);
+            return room;
+          })
+          .toList();
+
+      hotel.getRooms().addAll(rooms);
+    }
+
+    return hotel;
+  }
+
 }
