@@ -35,6 +35,7 @@ public class HotelService {
     return hotelMapper.toDTO(hotel);
   }
 
+  @Transactional
   public HotelDTO findById(long id) {
     Hotel hotel = repository.findById(id)
         .orElseThrow(() -> new EntityNotFoundException(EntityType.HOTEL, "id", id));
