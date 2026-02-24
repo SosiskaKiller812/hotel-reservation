@@ -19,13 +19,15 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "hotels")
 public class Hotel {
@@ -42,10 +44,10 @@ public class Hotel {
 
   private BigDecimal rating;
 
-  @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL)
   private List<Room> rooms;
 
-  @ManyToMany(fetch = FetchType.EAGER)
+  @ManyToMany
   @JoinTable(
       name = "hotel_conveniences",
       joinColumns = @JoinColumn(name = "hotel_id"),
