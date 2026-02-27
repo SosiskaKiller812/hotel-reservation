@@ -25,32 +25,32 @@ public class HotelCRUD {
 
   private final HotelService hotelService;  
 
-  @PostMapping("/create")
+  @PostMapping
   public ResponseEntity<HotelDTO> create(@RequestBody HotelDTO hotelRequest) {
     return ResponseEntity.status(HttpStatus.CREATED).body(hotelService.create(hotelRequest));
   }
 
-  @PostMapping("/create/non-transactional")
+  @PostMapping("/non-transactional")
   public ResponseEntity<HotelDTO> postMethodName(@RequestBody HotelDTO hotelRequest) {
     return ResponseEntity.status(HttpStatus.OK).body(hotelService.createWithoutTransactional(hotelRequest, false));
   }
 
-  @GetMapping("/id/{id}")
+  @GetMapping("/{id}")
   public ResponseEntity<HotelDTO> findById(@PathVariable Long id) {
     return ResponseEntity.status(HttpStatus.FOUND).body(hotelService.findById(id));
   }
 
-  @GetMapping("")
+  @GetMapping
   public ResponseEntity<List<HotelDTO>> findAll() {
     return ResponseEntity.status(HttpStatus.FOUND).body(hotelService.findAll());
   }
 
-  @PutMapping("/update")
+  @PutMapping
   public ResponseEntity<HotelDTO> update(@RequestBody HotelDTO hotelRequest) {
     return ResponseEntity.status(HttpStatus.OK).body(hotelService.update(hotelRequest));
   }
 
-  @DeleteMapping("/remove/{id}")
+  @DeleteMapping("/{id}")
   public ResponseEntity<String> removeById(@PathVariable Long id) {
     hotelService.removeById(id);
     return ResponseEntity.status(HttpStatus.OK).body("Deleted");

@@ -79,6 +79,8 @@
           <configLocation>config/checkstyle/checkstyle.xml</configLocation>
           <consoleOutput>true</consoleOutput>
           <failsOnError>true</failsOnError>
+          <failOnViolation> true</failOnViolation>
+          <violationSeverity>warning</violationSeverity>
           <linkXRef>false</linkXRef>
         </configuration>
         <executions>

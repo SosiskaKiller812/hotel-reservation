@@ -19,31 +19,31 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("booking/")
+@RequestMapping("bookings/")
 public class BookingCRUD {
   private final BookingService bookingService;
 
-  @PostMapping("/create")
+  @PostMapping
   public ResponseEntity<BookingDTO> create(@RequestBody BookingDTO bookingRequest) {
     return ResponseEntity.status(HttpStatus.CREATED).body(bookingService.create(bookingRequest));
   }
 
-  @GetMapping("/id/{id}")
+  @GetMapping("/{id}")
   public ResponseEntity<BookingDTO> findById(@PathVariable Long id) {
     return ResponseEntity.status(HttpStatus.FOUND).body(bookingService.findById(id));
   }
 
-  @GetMapping("")
+  @GetMapping
   public ResponseEntity<List<BookingDTO>> findAll() {
     return ResponseEntity.status(HttpStatus.FOUND).body(bookingService.findAll());
   }
 
-  @PutMapping("/update")
+  @PutMapping
   public ResponseEntity<BookingDTO> update(@RequestBody BookingDTO bookingRequest) {
     return ResponseEntity.status(HttpStatus.OK).body(bookingService.update(bookingRequest));
   }
 
-  @DeleteMapping("/remove/{id}")
+  @DeleteMapping("/{id}")
   public ResponseEntity<String> removeById(@PathVariable Long id) {
     bookingService.removeById(id);
     return ResponseEntity.status(HttpStatus.OK).body("Deleted");

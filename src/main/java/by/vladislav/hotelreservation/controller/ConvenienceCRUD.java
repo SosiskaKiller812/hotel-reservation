@@ -23,27 +23,27 @@ import lombok.AllArgsConstructor;
 public class ConvenienceCRUD {
   private final ConvenienceService convenienceService;
 
-  @PostMapping("/create")
+  @PostMapping
   public ResponseEntity<ConvenienceDTO> create(@RequestBody ConvenienceDTO hotelRequest) {
     return ResponseEntity.status(HttpStatus.CREATED).body(convenienceService.create(hotelRequest));
   }
 
-  @GetMapping("/id/{id}")
+  @GetMapping("/{id}")
   public ResponseEntity<ConvenienceDTO> findById(@PathVariable Long id) {
     return ResponseEntity.status(HttpStatus.FOUND).body(convenienceService.findById(id));
   }
 
-  @GetMapping("")
+  @GetMapping
   public ResponseEntity<List<ConvenienceDTO>> findAll() {
     return ResponseEntity.status(HttpStatus.FOUND).body(convenienceService.findAll());
   }
 
-  @PutMapping("/update")
+  @PutMapping
   public ResponseEntity<ConvenienceDTO> update(@RequestBody ConvenienceDTO convenienceRequest) {
     return ResponseEntity.status(HttpStatus.OK).body(convenienceService.update(convenienceRequest));
   }
 
-  @DeleteMapping("/remove/{id}")
+  @DeleteMapping("/{id}")
   public ResponseEntity<String> removeById(@PathVariable Long id) {
     convenienceService.removeById(id);
     return ResponseEntity.status(HttpStatus.FOUND).body("Deleted");
