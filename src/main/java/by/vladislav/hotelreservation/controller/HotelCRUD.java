@@ -6,8 +6,10 @@ import by.vladislav.hotelreservation.entity.dto.HotelDTO;
 import by.vladislav.hotelreservation.service.HotelService;
 import lombok.AllArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,19 +29,13 @@ public class HotelCRUD {
   private final HotelService hotelService;
 
   @PostMapping
-  public ResponseEntity<HotelDTO> create(@RequestBody HotelDTO hotelRequest, @RequestParam Boolean isException) {
-    return ResponseEntity.status(HttpStatus.CREATED).body(hotelService.create(hotelRequest, isException));
+  public ResponseEntity<HotelDTO> create(@RequestBody HotelDTO hotelRequest) {
+    return ResponseEntity.status(HttpStatus.CREATED).body(hotelService.create(hotelRequest));
   }
 
   @PostMapping("/list")
   public ResponseEntity<List<HotelDTO>> createList(@RequestBody List<HotelDTO> hotelRequest) {
     return ResponseEntity.status(HttpStatus.CREATED).body(hotelService.createList(hotelRequest));
-  }
-
-  @PostMapping("/non-transactional")
-  public ResponseEntity<HotelDTO> postMethodName(@RequestBody HotelDTO hotelRequest) {
-    return ResponseEntity.status(HttpStatus.OK)
-        .body(hotelService.createWithoutTransactional(hotelRequest, true));
   }
 
   @GetMapping("/{id}")
@@ -52,6 +48,17 @@ public class HotelCRUD {
     return ResponseEntity.status(HttpStatus.OK).body(hotelService.findAll());
   }
 
+  @GetMapping("/search")
+  public ResponseEntity<Page<HotelDTO>> search(
+      @RequestParam String country,
+      @RequestParam BigDecimal minRating,
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "10") int size) {
+    Page<HotelDTO> result = hotelService.findByCountryAndGreaterThanMinRating(country, minRating, page, size);
+
+    return ResponseEntity.ok(result);
+  }
+
   @PutMapping
   public ResponseEntity<HotelDTO> update(@RequestBody HotelDTO hotelRequest) {
     return ResponseEntity.status(HttpStatus.OK).body(hotelService.update(hotelRequest));
@@ -59,7 +66,7 @@ public class HotelCRUD {
 
   @DeleteMapping("/{id}")
   public ResponseEntity<String> removeById(@PathVariable Long id) {
-    hotelService.removeById(id);
+    hotelService.deleteById(id);
     return ResponseEntity.status(HttpStatus.OK).body("Deleted");
   }
 }
