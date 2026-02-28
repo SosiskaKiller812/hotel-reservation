@@ -31,12 +31,12 @@ public class RoomCRUD {
 
   @GetMapping("/{id}")
   public ResponseEntity<RoomDTO> findById(@PathVariable Long hotelId, @PathVariable Long id) {
-    return ResponseEntity.status(HttpStatus.FOUND).body(roomService.findById(hotelId, id));
+    return ResponseEntity.status(HttpStatus.OK).body(roomService.findById(hotelId, id));
   }
 
   @GetMapping
   public ResponseEntity<List<RoomDTO>> findAll(@PathVariable Long hotelId) {
-    return ResponseEntity.status(HttpStatus.FOUND).body(roomService.findAll(hotelId));
+    return ResponseEntity.status(HttpStatus.OK).body(roomService.findAll(hotelId));
   }
 
   @PutMapping

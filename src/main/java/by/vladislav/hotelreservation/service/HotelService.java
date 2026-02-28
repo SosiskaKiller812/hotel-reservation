@@ -1,6 +1,7 @@
 package by.vladislav.hotelreservation.service;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -11,6 +12,7 @@ import by.vladislav.hotelreservation.entity.Convenience;
 import by.vladislav.hotelreservation.entity.Hotel;
 import by.vladislav.hotelreservation.entity.Room;
 import by.vladislav.hotelreservation.entity.constant.EntityType;
+import by.vladislav.hotelreservation.entity.dto.ConvenienceDTO;
 import by.vladislav.hotelreservation.entity.dto.HotelDTO;
 import by.vladislav.hotelreservation.exception.EntityNotFoundException;
 import by.vladislav.hotelreservation.mapper.HotelMapper;
@@ -57,7 +59,7 @@ public class HotelService {
 
   @Transactional
   public HotelDTO create(HotelDTO dto) {
-    Set<Convenience> conveniences = new HashSet<>(convenienceRepository.findByNameIn(dto.conveniences()));
+    Set<Convenience> conveniences = getConveniences(dto.conveniences());
 
     Hotel hotel = hotelMapper.toEntity(dto);
     hotel.setConveniences(conveniences);
@@ -77,15 +79,41 @@ public class HotelService {
     return hotelMapper.toDTO(savedHotel);
   }
 
-  public HotelDTO createWithoutTransactional(HotelDTO dto, boolean isTransactional) {
-    Set<Convenience> conveniences = new HashSet<>(convenienceRepository.findByNameIn(dto.conveniences()));
+  @Transactional
+  public HotelDTO create(HotelDTO dto, Boolean isException) {
+    Set<Convenience> conveniences = getConveniences(dto.conveniences());
+
+    Hotel hotel = hotelMapper.toEntity(dto);
+    hotel.setConveniences(conveniences);
+
+    Hotel savedHotel = repository.save(hotel);
+
+    if (isException && isException != null) {
+      throw new IllegalArgumentException("Error");
+    }
+
+    if (dto.rooms() != null) {
+      List<Room> rooms = dto.rooms().stream()
+          .map(roomMapper::toEntity)
+          .toList();
+
+      rooms.forEach(room -> room.setHotel(savedHotel));
+
+      savedHotel.setRooms(rooms);
+    }
+
+    return hotelMapper.toDTO(savedHotel);
+  }
+
+  public HotelDTO createWithoutTransactional(HotelDTO dto, boolean isException) {
+    Set<Convenience> conveniences = getConveniences(dto.conveniences());
 
     Hotel hotel = hotelMapper.toEntity(dto);
     hotel.setConveniences(conveniences);
 
     Hotel savedHotel = repository.saveAndFlush(hotel);
 
-    if (!isTransactional) {
+    if (isException) {
       throw new IllegalArgumentException("Error");
     }
 
@@ -116,7 +144,7 @@ public class HotelService {
     hotel.getAddress().setCity(dto.address().city());
     hotel.getAddress().setStreet(dto.address().street());
 
-    Set<Convenience> conveniences = new HashSet<>(convenienceRepository.findByNameIn(dto.conveniences()));
+    Set<Convenience> conveniences = getConveniences(dto.conveniences());
     hotel.setConveniences(conveniences);
 
     hotel.getRooms().clear();
@@ -136,4 +164,22 @@ public class HotelService {
     return hotelMapper.toDTO(hotel);
   }
 
+  @Transactional
+  public List<HotelDTO> createList(List<HotelDTO> hotelRequest) {
+    List<HotelDTO> hotelDTOs = new ArrayList<>(hotelRequest.size());
+    for (HotelDTO hotelDTO : hotelRequest) {
+      hotelDTOs.add(create(hotelDTO));
+    }
+
+    return hotelDTOs;
+  }
+
+  private Set<Convenience> getConveniences(Collection<ConvenienceDTO> dtos) {
+    Set<String> convenienceStrings = new HashSet<>();
+    for (ConvenienceDTO dto : dtos) {
+      convenienceStrings.add(dto.name());
+    }
+
+    return new HashSet<>(convenienceRepository.findByNameIn(convenienceStrings));
+  }
 }

@@ -19,33 +19,29 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("bookings/")
+@RequestMapping("rooms/{roomId}/bookings")
 public class BookingCRUD {
   private final BookingService bookingService;
 
   @PostMapping
-  public ResponseEntity<BookingDTO> create(@RequestBody BookingDTO bookingRequest) {
-    return ResponseEntity.status(HttpStatus.CREATED).body(bookingService.create(bookingRequest));
-  }
-
-  @GetMapping("/{id}")
-  public ResponseEntity<BookingDTO> findById(@PathVariable Long id) {
-    return ResponseEntity.status(HttpStatus.FOUND).body(bookingService.findById(id));
+  public ResponseEntity<BookingDTO> create(@PathVariable Long roomId, @RequestBody BookingDTO bookingRequest) {
+    return ResponseEntity.status(HttpStatus.CREATED).body(bookingService.create(roomId, bookingRequest));
   }
 
   @GetMapping
-  public ResponseEntity<List<BookingDTO>> findAll() {
-    return ResponseEntity.status(HttpStatus.FOUND).body(bookingService.findAll());
+  public ResponseEntity<List<BookingDTO>> findById(@PathVariable Long roomId) {
+    return ResponseEntity.status(HttpStatus.OK).body(bookingService.findByRoomId(roomId));
   }
 
-  @PutMapping
-  public ResponseEntity<BookingDTO> update(@RequestBody BookingDTO bookingRequest) {
-    return ResponseEntity.status(HttpStatus.OK).body(bookingService.update(bookingRequest));
+  @PutMapping("/{bookingId}")
+  public ResponseEntity<BookingDTO> update(@PathVariable Long roomId, @PathVariable Long bookingId,
+      @RequestBody BookingDTO bookingRequest) {
+    return ResponseEntity.status(HttpStatus.OK).body(bookingService.update(roomId, bookingId, bookingRequest));
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<String> removeById(@PathVariable Long id) {
-    bookingService.removeById(id);
+  public ResponseEntity<String> removeById(@PathVariable Long roomId, @PathVariable Long id) {
+    bookingService.removeById(roomId, id);
     return ResponseEntity.status(HttpStatus.OK).body("Deleted");
   }
 

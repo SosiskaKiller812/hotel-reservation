@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PutMapping;
 
 @AllArgsConstructor
@@ -23,26 +24,32 @@ import org.springframework.web.bind.annotation.PutMapping;
 @RequestMapping("/hotels")
 public class HotelCRUD {
 
-  private final HotelService hotelService;  
+  private final HotelService hotelService;
 
   @PostMapping
-  public ResponseEntity<HotelDTO> create(@RequestBody HotelDTO hotelRequest) {
-    return ResponseEntity.status(HttpStatus.CREATED).body(hotelService.create(hotelRequest));
+  public ResponseEntity<HotelDTO> create(@RequestBody HotelDTO hotelRequest, @RequestParam Boolean isException) {
+    return ResponseEntity.status(HttpStatus.CREATED).body(hotelService.create(hotelRequest, isException));
+  }
+
+  @PostMapping("/list")
+  public ResponseEntity<List<HotelDTO>> createList(@RequestBody List<HotelDTO> hotelRequest) {
+    return ResponseEntity.status(HttpStatus.CREATED).body(hotelService.createList(hotelRequest));
   }
 
   @PostMapping("/non-transactional")
   public ResponseEntity<HotelDTO> postMethodName(@RequestBody HotelDTO hotelRequest) {
-    return ResponseEntity.status(HttpStatus.OK).body(hotelService.createWithoutTransactional(hotelRequest, false));
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(hotelService.createWithoutTransactional(hotelRequest, true));
   }
 
   @GetMapping("/{id}")
   public ResponseEntity<HotelDTO> findById(@PathVariable Long id) {
-    return ResponseEntity.status(HttpStatus.FOUND).body(hotelService.findById(id));
+    return ResponseEntity.status(HttpStatus.OK).body(hotelService.findById(id));
   }
 
   @GetMapping
   public ResponseEntity<List<HotelDTO>> findAll() {
-    return ResponseEntity.status(HttpStatus.FOUND).body(hotelService.findAll());
+    return ResponseEntity.status(HttpStatus.OK).body(hotelService.findAll());
   }
 
   @PutMapping

@@ -30,12 +30,12 @@ public class ConvenienceCRUD {
 
   @GetMapping("/{id}")
   public ResponseEntity<ConvenienceDTO> findById(@PathVariable Long id) {
-    return ResponseEntity.status(HttpStatus.FOUND).body(convenienceService.findById(id));
+    return ResponseEntity.status(HttpStatus.OK).body(convenienceService.findById(id));
   }
 
   @GetMapping
   public ResponseEntity<List<ConvenienceDTO>> findAll() {
-    return ResponseEntity.status(HttpStatus.FOUND).body(convenienceService.findAll());
+    return ResponseEntity.status(HttpStatus.OK).body(convenienceService.findAll());
   }
 
   @PutMapping
@@ -46,7 +46,7 @@ public class ConvenienceCRUD {
   @DeleteMapping("/{id}")
   public ResponseEntity<String> removeById(@PathVariable Long id) {
     convenienceService.removeById(id);
-    return ResponseEntity.status(HttpStatus.FOUND).body("Deleted");
+    return ResponseEntity.status(HttpStatus.OK).body("Deleted");
   }
 
 }

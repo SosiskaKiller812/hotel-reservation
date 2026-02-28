@@ -23,7 +23,7 @@ public class AddressCRUD {
 
   @GetMapping
   public ResponseEntity<AddressDTO> findAddress(@PathVariable Long hotelId) {
-    return ResponseEntity.status(HttpStatus.FOUND).body(addressService.findAddress(hotelId));
+    return ResponseEntity.status(HttpStatus.OK).body(addressService.findAddress(hotelId));
   }
 
   @PutMapping

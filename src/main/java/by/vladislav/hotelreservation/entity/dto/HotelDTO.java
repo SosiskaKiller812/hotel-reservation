@@ -10,5 +10,5 @@ public record HotelDTO(
     AddressDTO address,
     BigDecimal rating,
     List<RoomDTO> rooms,
-    Set<String> conveniences) {
+    Set<ConvenienceDTO> conveniences) {
 }

@@ -3,6 +3,7 @@ package by.vladislav.hotelreservation.service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -11,11 +12,11 @@ import by.vladislav.hotelreservation.entity.Booking;
 import by.vladislav.hotelreservation.entity.Room;
 import by.vladislav.hotelreservation.entity.constant.EntityType;
 import by.vladislav.hotelreservation.entity.dto.BookingDTO;
-import by.vladislav.hotelreservation.entity.dto.RoomDTO;
 import by.vladislav.hotelreservation.exception.EntityNotFoundException;
 import by.vladislav.hotelreservation.mapper.BookingMapper;
 import by.vladislav.hotelreservation.repository.BookingRepository;
 import by.vladislav.hotelreservation.repository.RoomRepository;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -26,45 +27,68 @@ public class BookingService {
   private final BookingMapper bookingMapper;
   private final RoomRepository roomRepository;
 
-  public BookingDTO create(BookingDTO dto) {
+  @Transactional
+  public BookingDTO create(Long roomId, BookingDTO dto) {
 
-    RoomDTO roomDto = dto.room();
-    Room room = roomRepository.findById(roomDto.id())
-        .orElseThrow(() -> new EntityNotFoundException(EntityType.ROOM, "id", roomDto.id()));
+    if (dto.checkOutDate().isBefore(dto.checkInDate())) {
+      throw new IllegalArgumentException("Check-out date must be after check-in date");
+    }
+
+    boolean exists = bookingRepository
+        .existsByRoomIdAndCheckInDateLessThanAndCheckOutDateGreaterThan(
+            roomId,
+            dto.checkOutDate(),
+            dto.checkInDate());
+
+    if (exists) {
+      throw new IllegalStateException("Room is already booked for these dates");
+    }
+
+    Room room = roomRepository.findById(roomId)
+        .orElseThrow(() -> new EntityNotFoundException(EntityType.ROOM, "id", roomId));
 
     Booking entity = bookingMapper.toEntity(dto);
 
     BigDecimal totalPrice = calculatePrice(
         dto.checkInDate(),
         dto.checkOutDate(),
-        dto.room().pricePerNight());
+        room.getPricePerNight());
 
     entity.setTotalPrice(totalPrice);
     entity.setRoom(room);
 
     entity = bookingRepository.save(entity);
     return bookingMapper.toDTO(entity);
-
   }
 
-  public BookingDTO findById(long id) {
-    Booking entity = bookingRepository.findById(id)
-        .orElseThrow(() -> new EntityNotFoundException(EntityType.BOOKING, "id", id));
-    return bookingMapper.toDTO(entity);
+  public List<BookingDTO> findByRoomId(long roomId) {
+    List<Booking> list = bookingRepository.findByRoomId(roomId);
+    List<BookingDTO> result = new ArrayList<>(list.size());
+    for (Booking booking : list) {
+      BookingDTO dto = bookingMapper.toDTO(booking);
+      result.add(dto);
+    }
+    return result;
   }
 
-  public List<BookingDTO> findAll() {
-    List<Booking> entityList = bookingRepository.findAll();
+  @Transactional
+  public BookingDTO update(Long roomId, Long bookingId, BookingDTO dto) {
 
-    return entityList.stream()
-        .map(entity -> bookingMapper.toDTO(entity))
-        .toList();
-  }
+    if (dto.checkOutDate().isBefore(dto.checkInDate())) {
+      throw new IllegalArgumentException("Check-out date must be after check-in date");
+    }
 
-  public BookingDTO update(BookingDTO dto) {
-    Booking entity = bookingRepository.findById(dto.id())
-        .orElseThrow(
-            () -> new EntityNotFoundException(EntityType.BOOKING, "id", dto.id()));
+    boolean exists = bookingRepository
+        .existsByRoomIdAndCheckInDateLessThanAndCheckOutDateGreaterThan(
+            roomId,
+            dto.checkOutDate(),
+            dto.checkInDate());
+
+    if (exists) {
+      throw new IllegalStateException("Room is already booked for these dates");
+    }
+
+    Booking entity = findBooking(roomId, bookingId);
 
     entity.setGuestName(dto.guestName());
     entity.setCheckInDate(dto.checkInDate());
@@ -82,8 +106,9 @@ public class BookingService {
     return bookingMapper.toDTO(updatedEntity);
   }
 
-  public void removeById(long id) {
-    bookingRepository.deleteById(id);
+  public void removeById(Long roomId, Long bookingId) {
+    Booking booking = findBooking(roomId, bookingId);
+    bookingRepository.delete(booking);
   }
 
   private BigDecimal calculatePrice(LocalDate start, LocalDate end, BigDecimal pricePerNight) {
@@ -92,5 +117,10 @@ public class BookingService {
     }
     long nights = ChronoUnit.DAYS.between(start, end);
     return pricePerNight.multiply(BigDecimal.valueOf(nights));
+  }
+
+  public Booking findBooking(Long roomId, Long bookingId) {
+    return bookingRepository.findByIdAndRoomId(bookingId, roomId)
+        .orElseThrow(() -> new EntityNotFoundException(EntityType.BOOKING, "id", bookingId));
   }
 }

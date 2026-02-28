@@ -32,7 +32,7 @@ public class Room {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id;
 
-  @Column(unique = true, nullable = false)
+  @Column(nullable = false)
   private int number;
 
   @Column(nullable = false)

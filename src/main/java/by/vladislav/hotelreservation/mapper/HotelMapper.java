@@ -7,9 +7,9 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 import by.vladislav.hotelreservation.entity.Address;
-import by.vladislav.hotelreservation.entity.Convenience;
 import by.vladislav.hotelreservation.entity.Hotel;
 import by.vladislav.hotelreservation.entity.dto.AddressDTO;
+import by.vladislav.hotelreservation.entity.dto.ConvenienceDTO;
 import by.vladislav.hotelreservation.entity.dto.HotelDTO;
 import by.vladislav.hotelreservation.entity.dto.RoomDTO;
 import lombok.AllArgsConstructor;
@@ -19,6 +19,7 @@ import lombok.AllArgsConstructor;
 public class HotelMapper {
 
   private final RoomMapper roomMapper;
+  private final ConvenienceMapper convenienceMapper;
 
   public Hotel toEntity(HotelDTO dto) {
     Address address = Address.builder()
@@ -42,8 +43,8 @@ public class HotelMapper {
         hotel.getAddress().getCity(),
         hotel.getAddress().getStreet());
 
-    Set<String> conveniencesStrings = hotel.getConveniences().stream()
-        .map(Convenience::getName)
+    Set<ConvenienceDTO> conveniencesDTOs = hotel.getConveniences().stream()
+        .map(convenienceMapper::toDTO)
         .collect(Collectors.toSet());
 
     List<RoomDTO> roomsDTO = hotel.getRooms().stream()
@@ -56,6 +57,6 @@ public class HotelMapper {
         addressDTO,
         hotel.getRating(),
         roomsDTO,
-        conveniencesStrings);
+        conveniencesDTOs);
   }
 }

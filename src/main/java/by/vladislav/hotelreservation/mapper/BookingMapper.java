@@ -1,8 +1,5 @@
 package by.vladislav.hotelreservation.mapper;
 
-import java.math.BigDecimal;
-import java.time.temporal.ChronoUnit;
-
 import org.springframework.stereotype.Component;
 
 import by.vladislav.hotelreservation.entity.Booking;
@@ -17,17 +14,11 @@ public class BookingMapper {
 
   public Booking toEntity(BookingDTO dto) {
 
-    long numberOfNights = ChronoUnit.DAYS.between(dto.checkInDate(), dto.checkOutDate());
-
-    BigDecimal pricePerNight = dto.room().pricePerNight();
-
-    BigDecimal totalPrice = pricePerNight.multiply(BigDecimal.valueOf(numberOfNights));
-
     return Booking.builder()
         .guestName(dto.guestName())
         .checkInDate(dto.checkInDate())
         .checkOutDate(dto.checkOutDate())
-        .totalPrice(totalPrice)
+        .totalPrice(null)
         .room(null)
         .build();
   }
