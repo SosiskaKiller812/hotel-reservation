@@ -2,6 +2,8 @@
 
 REST API is a Java + Spring Boot application for managing the hotel booking system.
 
+[SonarCloud](https://sonarcloud.io/summary/overall?id=SosiskaKiller812_hotel-reservation&branch=main)
+
 ## About the project
 
 The project implements the basic architecture of a server application using:
