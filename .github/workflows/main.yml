@@ -12,6 +12,7 @@ concurrency:
 
 permissions:
   contents: read
+  packages: write
 
 jobs:
   build:
@@ -83,24 +84,40 @@ jobs:
         npm run lint
 
   deploy:
-    name: Deploy
+    name: Build, Push to GHCR & Deploy
     needs: [ build, test ]
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    env:
-      RENDER_BACKEND_DEPLOY_HOOK: ${{ secrets.RENDER_BACKEND_DEPLOY_HOOK }}
-      RENDER_FRONTEND_DEPLOY_HOOK: ${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK }}
     steps:
-    - name: Validate deploy hooks
-      run: |
-        if [ -z "${RENDER_BACKEND_DEPLOY_HOOK}" ] && [ -z "${RENDER_FRONTEND_DEPLOY_HOOK}" ]; then
-          echo "Set at least one secret: RENDER_BACKEND_DEPLOY_HOOK or RENDER_FRONTEND_DEPLOY_HOOK"
-          exit 1
-        fi
+    - name: Checkout
+      uses: actions/checkout@v4
 
-    - name: Trigger backend deploy
-      if: env.RENDER_BACKEND_DEPLOY_HOOK != ''
-      run: curl -fsS -X POST "${{ env.RENDER_BACKEND_DEPLOY_HOOK }}"
+    - name: Login to GHCR
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ghcr.io/${{ github.repository }}
+        tags: |
+          type=raw,value=latest
+          type=sha
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v6
+      with:
+        context: .
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+
+    - name: Trigger Render Deploy
+      if: secrets.RENDER_DEPLOY_HOOK != ''
+      run: curl -fsS -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
 
   healthcheck:
     name: Healthcheck
