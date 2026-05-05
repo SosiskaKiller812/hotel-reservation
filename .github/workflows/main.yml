@@ -77,48 +77,50 @@ jobs:
         cache: 'npm'
         cache-dependency-path: frontend/package-lock.json
 
-    - name: Run frontend lint & test
+    - name: Run frontend lint
       working-directory: frontend
       run: |
         npm ci
-        npm run lint || echo "Lint failed, but continuing..."
-        # npm test # Раскомментируй, если добавишь тесты на фронт
+        npm run lint || echo "Lint failed"
 
   deploy:
     name: Deploy
     needs: [ build, test ]
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    env:
+      RENDER_BACKEND_DEPLOY_HOOK: ${{ secrets.RENDER_BACKEND_DEPLOY_HOOK }}
+      RENDER_FRONTEND_DEPLOY_HOOK: ${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK }}
     steps:
     - name: Trigger Render Deploy (Backend)
-      if: secrets.RENDER_BACKEND_DEPLOY_HOOK != ''
-      run: curl -fsS -X POST "${{ secrets.RENDER_BACKEND_DEPLOY_HOOK }}"
+      if: env.RENDER_BACKEND_DEPLOY_HOOK != ''
+      run: curl -fsS -X POST "${{ env.RENDER_BACKEND_DEPLOY_HOOK }}"
 
     - name: Trigger Render Deploy (Frontend)
-      if: secrets.RENDER_FRONTEND_DEPLOY_HOOK != ''
-      run: curl -fsS -X POST "${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK }}"
+      if: env.RENDER_FRONTEND_DEPLOY_HOOK != ''
+      run: curl -fsS -X POST "${{ env.RENDER_FRONTEND_DEPLOY_HOOK }}"
 
   healthcheck:
     name: Healthcheck
     needs: deploy
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    env:
+      APP_HEALTHCHECK_URL: ${{ secrets.APP_HEALTHCHECK_URL }}
     steps:
     - name: Wait and Probe Health
       run: |
-        # Используем базовый URL фронтенда для проверки проксирования
-        URL="${{ secrets.APP_HEALTHCHECK_URL }}"
-        echo "Checking health for $URL/api/actuator/health"
+        if [ -z "${APP_HEALTHCHECK_URL}" ]; then
+          exit 0
+        fi
+
+        URL="${APP_HEALTHCHECK_URL%/}"
 
         for i in {1..20}; do
-          # Проверяем статус через API-путь
           RESPONSE=$(curl -s "$URL/api/actuator/health" || true)
           if echo "$RESPONSE" | grep -q '"status":"UP"'; then
-            echo "Healthcheck passed!"
             exit 0
           fi
-          echo "Attempt $i: App is not ready yet, retrying in 15s..."
           sleep 15
         done
-        echo "Healthcheck timed out."
         exit 1
