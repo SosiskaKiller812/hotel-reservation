@@ -1,40 +1,47 @@
+version: 1 # Это поле часто забывают, но оно обязательно
 services:
 # Backend (Java Spring Boot)
 - type: web
   name: spring-backend
   env: docker
-  dockerContext: ./backend # путь до папки с бэкендом
+  region: frankfurt # Рекомендую указать регион (например, frankfurt ближе к РБ)
+  plan: free
+  dockerContext: ./backend
   dockerfilePath: ./backend/Dockerfile
-  plan: free # или starter
   envVars:
   - key: SPRING_DATASOURCE_URL
     fromDatabase:
-      name: my-database
+      name: hotel-db # Имя должно совпадать с названием в блоке databases
       property: connectionString
-  - key: SPRING_REDIS_HOST
+  - key: SPRING_REDIS_URL # Spring Boot проще переварит полную строку подключения
     fromService:
       type: redis
-      name: my-cache
-      property: host
+      name: hotel-cache
+      property: connectionString
 
 # Frontend (React)
 - type: web
   name: react-frontend
   env: docker
+  region: frankfurt
+  plan: free
   dockerContext: ./frontend
   dockerfilePath: ./frontend/Dockerfile
-  plan: free
   envVars:
   - key: REACT_APP_API_URL
+    # Важно: URL будет доступен только после первого деплоя. 
+    # Если имя сервиса 'spring-backend', то URL будет:
     value: https://spring-backend.onrender.com
 
 # База данных
 databases:
-- name: my-database
+- name: hotel-db
   plan: free
+  region: frankfurt
 
 # Redis
 redis:
-- name: my-cache
+- name: hotel-cache
   plan: free
-  ipAllowList: [] # разрешить доступ только внутренним сервисам
+  region: frankfurt
+  ipAllowList: [] # По умолчанию разрешает доступ только внутри сети Render
