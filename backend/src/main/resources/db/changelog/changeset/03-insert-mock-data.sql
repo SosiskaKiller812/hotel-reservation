@@ -15,7 +15,7 @@ INSERT INTO hotels (id, name, rating, address_id) VALUES
 (nextval('hotel_sequence'), 'Rhyloo', 4.76, (SELECT id FROM addresses WHERE country = 'Botswana' AND city = 'Kopong' AND street = '21 Jenifer Road')),
 (nextval('hotel_sequence'), 'DabZ', 2.11, (SELECT id FROM addresses WHERE country = 'China' AND city = 'Rongmei' AND street = '1 Mifflin Center'));
  
--- Rooms (sample from MOCK_DATA.json)
+-- Rooms (sample from MOCK_DATA.json) 
 INSERT INTO rooms (id, hotel_id, number, type, price_per_night) VALUES
 (nextval('room_sequence'), (SELECT id FROM hotels WHERE name = 'Meevee'), 485, 'BUSINESS', 742.80),
 (nextval('room_sequence'), (SELECT id FROM hotels WHERE name = 'Meevee'), 291, 'FAMILY', 688.11),
