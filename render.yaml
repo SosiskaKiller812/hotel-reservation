@@ -1,0 +1,40 @@
+services:
+# Backend (Java Spring Boot)
+- type: web
+  name: spring-backend
+  env: docker
+  dockerContext: ./backend # путь до папки с бэкендом
+  dockerfilePath: ./backend/Dockerfile
+  plan: free # или starter
+  envVars:
+  - key: SPRING_DATASOURCE_URL
+    fromDatabase:
+      name: my-database
+      property: connectionString
+  - key: SPRING_REDIS_HOST
+    fromService:
+      type: redis
+      name: my-cache
+      property: host
+
+# Frontend (React)
+- type: web
+  name: react-frontend
+  env: docker
+  dockerContext: ./frontend
+  dockerfilePath: ./frontend/Dockerfile
+  plan: free
+  envVars:
+  - key: REACT_APP_API_URL
+    value: https://spring-backend.onrender.com
+
+# База данных
+databases:
+- name: my-database
+  plan: free
+
+# Redis
+redis:
+- name: my-cache
+  plan: free
+  ipAllowList: [] # разрешить доступ только внутренним сервисам
